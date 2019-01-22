@@ -46,10 +46,10 @@ class ContactUsAdmin(admin.ModelAdmin):
 
 @admin.register(RequestDayOffs)
 class RequestDayOffsAdmin(admin.ModelAdmin):
-    readonly_fields = []
+    readonly_fields = ['user', 'type']
     list_display = ["user", "from_date", "to_date", "reason", "type"]
     search_fields = ["user", "from_date", "to_date", "reason", "type"]
-    list_filter = ["reason", 'type']
+    list_filter = ["status", 'type']
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:

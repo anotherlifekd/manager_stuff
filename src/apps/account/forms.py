@@ -2,7 +2,8 @@ from django import forms
 from apps.account.models import User, ContactUs, RequestDayOffs
 from django.db.models import Q
 from datetime import timedelta, date
-
+from pdb import set_trace
+from apps import model_choices as mch
 
 class ProfileForm(forms.ModelForm):
 
@@ -36,7 +37,6 @@ class RequestDayOffForm(forms.ModelForm):
 
 
     def clean(self):
-        from pdb import set_trace
         cleaned_data = super().clean()
         self.user.id
         if not self.errors:
@@ -44,10 +44,10 @@ class RequestDayOffForm(forms.ModelForm):
                 self.add_error('to_date', 'from_date cannot be greater then to_date')
 
             data = cleaned_data['to_date'] - cleaned_data['from_date']
-            if cleaned_data['type'] == 3 and data.days > 1:
+            if cleaned_data['type'] == mch.REQUEST_DAYOFF and data.days > 1:
                 self.add_error('to_date', 'dayoff should be not more then 1 day')
 
-            if cleaned_data['type'] == 2:
+            if cleaned_data['type'] == mch.REQUEST_VACATION:
                 def daterange(start_date, end_date):
                     for n in range(int((end_date - start_date).days)):
                         yield start_date + timedelta(n)
@@ -65,6 +65,7 @@ class RequestDayOffForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.user = self.user
+        set_trace()
         if commit:
             instance.save()
         return instance

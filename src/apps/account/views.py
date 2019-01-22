@@ -11,19 +11,30 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
-def email(request):
-
-    subject = ''
-    message = ''
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = ['', ]
-
-    send_mail( subject, message, email_from, recipient_list )
-
-    return redirect('redirect to a new page')
+# def email(request):
+#
+#     subject = ''
+#     message = ''
+#     email_from = settings.EMAIL_HOST_USER
+#     recipient_list = ['', ]
+#
+#     send_mail( subject, message, email_from, recipient_list )
+#
+#     return redirect('redirect to a new page')
 
 
 def index(request):
+    from apps.account.tasks import send_email_async
+    # task_number_one.delay()
+    # task_number_one()
+
+    send_email_async.delay(
+        subject='Subject here',
+        message='Here is the message.',
+        from_email='from@example.com',
+        recipient_list=['to@example.com'],
+        fail_silently=False,
+    )
     return HttpResponse('Hello')
 
 @login_required
@@ -73,7 +84,7 @@ def contact_us(request):
         if form_us.is_valid():
             form_us.save()
             user_form = ContactUs.objects.last()
-            send_mail(user_form.title, user_form.text, 'bobertestdjango@gmail.com', [user_form.email])
+            #send_mail(user_form.title, user_form.text, 'bobertestdjango@gmail.com', [user_form.email])
             return redirect(reverse('account:index'))
 
     context_us = {'form': form_us}

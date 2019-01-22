@@ -80,3 +80,6 @@ class RequestDayOffs(models.Model):
 
     class Meta:
         verbose_name_plural = 'Request day offs'
+
+    def __str__(self):
+        return f'status: {self.get_status_display()}'
