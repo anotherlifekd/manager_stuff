@@ -4,7 +4,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from apps.account.forms import ProfileForm, ContactUsForm, RequestDayOffForm
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-#from pdb import set_trace
+from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 
 #smtp google email
 from django.core.mail import send_mail
@@ -24,18 +25,56 @@ from django.conf import settings
 
 
 def index(request):
-    from apps.account.tasks import send_email_async
+    from apps.account.tasks import send_email_async, task_number_one
     # task_number_one.delay()
     # task_number_one()
 
+    from apps.account.models import User
+    key = 'user_cache'
+    if key in cache:  # check if users exist in cache
+        users = cache.get(key)  # get users from cache
+        print('11'*100)
+    else:
+        users = list(User.objects.all()[:100])  # get users from db
+        cache.set(key, users, 15)  # set cache with key='user_cache', write 100 users for 15 seconds
+        print('222'*100)
+    # cache.delete(key)  # to delete cache by key
+
+
+    # 1
     send_email_async.delay(
-        subject='Subject here',
-        message='Here is the message.',
+        'Subject here',
+        'Here is the message.',
+        user=request.user.id,
         from_email='from@example.com',
         recipient_list=['to@example.com'],
-        fail_silently=False,
     )
-    return HttpResponse('Hello')
+
+    # 2
+    # send_email_async.apply_async(
+    #     args=('Subject here', 'Here is the message.'),
+    #     kwargs={'from_email': 'from@example.com',
+    #             'recipient_list': ['to@example.com']},
+    #     countdown=60 * 45,  # 45 min
+        # countdown=10,
+     # )
+    # from datetime import datetime, timedelta
+    # tomorrow = datetime.now() + timedelta(days=1)
+    #
+    # send_email_async.apply_async(
+    #     args=('Subject here', 'Here is the message.'),
+    #     kwargs={'from_email': 'from@example.com',
+    #             'recipient_list': ['to@example.com']},
+    #     eta=tomorrow,
+    #  )
+
+    return HttpResponse('Index')
+
+@cache_page(10)
+def cache_test(r):
+    from time import sleep
+    sleep(10)
+    return HttpResponse('Cache Test')
 
 @login_required
 def profile(request):

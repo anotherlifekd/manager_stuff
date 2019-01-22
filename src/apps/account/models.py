@@ -13,6 +13,10 @@ class User(AbstractUser):
     vacations_days = models.PositiveSmallIntegerField(null=False, blank=False, default=0)
     sickness_days = models.PositiveSmallIntegerField(null=False, blank=False, default=0)
 
+    @property
+    def is_hr(self):
+        return self.groups.filter(name='HR').exists()
+
     def save(self, *args, **kwargs):
         self.username = self.email
         super().save(*args, **kwargs)
@@ -82,4 +86,5 @@ class RequestDayOffs(models.Model):
         verbose_name_plural = 'Request day offs'
 
     def __str__(self):
-        return f'status: {self.get_status_display()}'
+        # return f'status: {self.get_status_display()}, user: {self.user}'  #makes extra DB call to get user object
+        return f'status: {self.get_status_display()}, user: {self.user_id}'  # user_id do not have extra DB call

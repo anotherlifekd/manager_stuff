@@ -15,6 +15,9 @@ class ProfileForm(forms.ModelForm):
             'city'
         ]
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
 class ContactUsForm(forms.ModelForm):
 
     class Meta:

@@ -45,19 +45,18 @@ class ContactUsAdmin(admin.ModelAdmin):
 
 
 @admin.register(RequestDayOffs)
-class RequestDayOffsAdmin(admin.ModelAdmin):
-    readonly_fields = ['user', 'type']
-    list_display = ["user", "from_date", "to_date", "reason", "type"]
-    search_fields = ["user", "from_date", "to_date", "reason", "type"]
-    list_filter = ["status", 'type']
+class RequestDayOffAdmin(admin.ModelAdmin):
+    list_filter = ('status', 'type')
+    readonly_fields = ('user', 'type')
+    # TODO add form
+    # TODO subtract dayoffs or vacations on Form Approve
 
     def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super().get_readonly_fields(self, request)
         if obj is not None:
-            return ['user']
-        if obj.status != mch.STATUS_PENDING:
-            return ["status"]
-
-    # def get_queryset(self, request):
-    #     qs = super().get_queryset(request)
-    #     if request.group.name:
-    #         return qs.exclude(name='test')
+            # if request.user.is_hr:  # check if request user in group
+            # if obj.status != mch.STATUS_PENDING and not request.user.is_superuser:  # allow superuser to change status field
+            if obj.status != mch.STATUS_PENDING:
+                readonly_fields += ('status', )
+                # readonly_fields = readonly_fields + ('status', )
+        return readonly_fields

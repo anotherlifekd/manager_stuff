@@ -150,3 +150,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 # CELERY_TIMEZONE = 'Asia/Makassar'
 CELERY_BEAT_SCHEDULE = {}
+
+from pdb import set_trace
+__builtins__['st'] = set_trace  # st()
