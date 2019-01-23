@@ -31,7 +31,7 @@ class RequestDayOffForm(forms.ModelForm):
     class Meta:
         model = RequestDayOffs
         fields = [
-            'type', 'from_date', 'to_date'
+            'type', 'from_date', 'to_date',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -41,7 +41,6 @@ class RequestDayOffForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        self.user.id
         if not self.errors:
             if cleaned_data['from_date'] > cleaned_data['to_date']:
                 self.add_error('to_date', 'from_date cannot be greater then to_date')
@@ -88,8 +87,60 @@ class UserAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        print(cleaned_data)
         if not self.errors:
             if User.objects.filter(Q(email=cleaned_data['email']) |
                                    Q(username=cleaned_data['email'])).exists():
+                print('YES')
                 raise forms.ValidationError('User already exists')
         return cleaned_data
+
+
+class RequestDayOffAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = RequestDayOffs
+        fields = [
+            'created', 'from_date', 'to_date',
+            'reason', 'type',
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.errors:
+            if cleaned_data['type'] == mch.STATUS_REJECTED:
+                if not cleaned_data['reason']:
+                    self.add_error('reason', "reason field is required")
+            return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        def daterange(start_date, end_date):
+            for n in range(int((end_date - start_date).days)):
+                yield start_date + timedelta(n)
+
+        start_date = instance.from_date
+        end_date = instance.to_date
+        count = 0
+        for single_date in daterange(start_date, end_date):
+            if single_date.isoweekday() == 6 or single_date.isoweekday() == 7:
+                continue
+            count += 1
+        user = User.objects.get(id=instance.user.id)
+        days = user.vacations_days - count
+        user.vacations_days = days
+        user.save()
+        if commit:
+            instance.save()
+        return instance
+
+
+class RequestDayOffAdminAddForm(forms.ModelForm):
+
+    class Meta:
+        model = RequestDayOffs
+        fields = [
+            'created', 'from_date', 'to_date',
+            'reason', 'type', 'user'
+        ]

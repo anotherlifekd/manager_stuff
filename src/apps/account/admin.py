@@ -1,6 +1,6 @@
 from django.contrib import admin
 from apps.account.models import User, City, ContactUs, RequestDayOffs
-from apps.account.forms import UserAdminForm
+from apps.account.forms import UserAdminForm, RequestDayOffAdminForm, RequestDayOffAdminAddForm
 from apps import model_choices as mch
 
 @admin.register(City)
@@ -47,16 +47,23 @@ class ContactUsAdmin(admin.ModelAdmin):
 @admin.register(RequestDayOffs)
 class RequestDayOffAdmin(admin.ModelAdmin):
     list_filter = ('status', 'type')
-    readonly_fields = ('user', 'type')
+    readonly_fields = ()
     # TODO add form
     # TODO subtract dayoffs or vacations on Form Approve
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj is None:
+            return RequestDayOffAdminAddForm
+        else:
+            return RequestDayOffAdminForm
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = super().get_readonly_fields(self, request)
         if obj is not None:
+            readonly_fields += ('user', )
             # if request.user.is_hr:  # check if request user in group
             # if obj.status != mch.STATUS_PENDING and not request.user.is_superuser:  # allow superuser to change status field
             if obj.status != mch.STATUS_PENDING:
                 readonly_fields += ('status', )
-                # readonly_fields = readonly_fields + ('status', )
+                # readonly_fields = readonly_fields + ('status', )]
         return readonly_fields

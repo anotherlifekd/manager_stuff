@@ -12,18 +12,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
-# def email(request):
-#
-#     subject = ''
-#     message = ''
-#     email_from = settings.EMAIL_HOST_USER
-#     recipient_list = ['', ]
-#
-#     send_mail( subject, message, email_from, recipient_list )
-#
-#     return redirect('redirect to a new page')
-
-
 def index(request):
     from apps.account.tasks import send_email_async, task_number_one
     # task_number_one.delay()
@@ -46,18 +34,18 @@ def index(request):
         'Subject here',
         'Here is the message.',
         user=request.user.id,
-        from_email='from@example.com',
-        recipient_list=['to@example.com'],
+        from_email='bobertestdjango@gmail.com',
+        recipient_list=['kryzhkot@gmail.com'],
     )
 
     # 2
     # send_email_async.apply_async(
-    #     args=('Subject here', 'Here is the message.'),
-    #     kwargs={'from_email': 'from@example.com',
-    #             'recipient_list': ['to@example.com']},
-    #     countdown=60 * 45,  # 45 min
-        # countdown=10,
-     # )
+    #     args=('SURPRISE', 'SOSI PISOS'),
+    #     kwargs={'from_email': 'bobertestdjango@gmail.com', 'user': request.user.id,
+    #             'recipient_list': ['kryzhkot@gmail.com']},
+    #     # countdown=60 * 45,  # 45 min
+    #     countdown=10,
+    #  )
     # from datetime import datetime, timedelta
     # tomorrow = datetime.now() + timedelta(days=1)
     #
@@ -129,9 +117,11 @@ def contact_us(request):
     context_us = {'form': form_us}
     return render(request, 'account/contact-us.html', context=context_us)
 
+@cache_page(10)
 def faq(request):
     return render(request, 'faq/faq.html')
 
+@cache_page(10)
 def tos(request):
     return render(request, 'tos/tos.html')
 
