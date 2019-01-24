@@ -1,9 +1,9 @@
 from django import forms
 from apps.account.models import User, ContactUs, RequestDayOffs
 from django.db.models import Q
-from datetime import timedelta, date
-from pdb import set_trace
+from datetime import timedelta, date, datetime
 from apps import model_choices as mch
+from apps.account.tasks import send_email_async
 
 class ProfileForm(forms.ModelForm):
 
@@ -67,7 +67,6 @@ class RequestDayOffForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.user = self.user
-        set_trace()
         if commit:
             instance.save()
         return instance
@@ -102,7 +101,7 @@ class RequestDayOffAdminForm(forms.ModelForm):
         model = RequestDayOffs
         fields = [
             'created', 'from_date', 'to_date',
-            'reason', 'type',
+            'reason', 'type', 'status',
         ]
 
     def clean(self):
@@ -115,7 +114,7 @@ class RequestDayOffAdminForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-
+        cleaned_data = super().clean()
         def daterange(start_date, end_date):
             for n in range(int((end_date - start_date).days)):
                 yield start_date + timedelta(n)
@@ -130,7 +129,26 @@ class RequestDayOffAdminForm(forms.ModelForm):
         user = User.objects.get(id=instance.user.id)
         days = user.vacations_days - count
         user.vacations_days = days
+        if cleaned_data['status'] == mch.STATUS_CONFIRMED:
+            instance.created = datetime.now()
+            send_email_async.delay(
+                'Request Status',
+                'Your request has been confirmed',
+                user=user.id,
+                from_email='bobertestdjango@gmail.com',
+                recipient_list=[user.email],
+            )
+        elif cleaned_data['status'] == mch.STATUS_REJECTED:
+            instance.created = datetime.now()
+            send_email_async.delay(
+                'Request Status',
+                'Your request has been rejected',
+                user=user.id,
+                from_email='bobertestdjango@gmail.com',
+                recipient_list=[user.email],
+            )
         user.save()
+
         if commit:
             instance.save()
         return instance

@@ -63,7 +63,7 @@ class RequestDayOffAdmin(admin.ModelAdmin):
             readonly_fields += ('user', )
             # if request.user.is_hr:  # check if request user in group
             # if obj.status != mch.STATUS_PENDING and not request.user.is_superuser:  # allow superuser to change status field
-            if obj.status != mch.STATUS_PENDING:
-                readonly_fields += ('status', )
+            # if obj.status != mch.STATUS_PENDING:
+            #     readonly_fields += ('status', ) #TODO ask Dima about add status field
                 # readonly_fields = readonly_fields + ('status', )]
         return readonly_fields

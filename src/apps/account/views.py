@@ -30,13 +30,13 @@ def index(request):
 
 
     # 1
-    send_email_async.delay(
-        'Subject here',
-        'Here is the message.',
-        user=request.user.id,
-        from_email='bobertestdjango@gmail.com',
-        recipient_list=['kryzhkot@gmail.com'],
-    )
+    # send_email_async.delay(
+    #     'Subject here',
+    #     'Here is the message.',
+    #     user=request.user.id,
+    #     from_email='bobertestdjango@gmail.com',
+    #     recipient_list=['kryzhkot@gmail.com'],
+    # )
 
     # 2
     # send_email_async.apply_async(
