@@ -141,7 +141,7 @@ EMAIL_HOST_PASSWORD = 'qwee1qwee'
 
 INTERNAL_IPS = '127.0.0.1'
 
-
+from celery.schedules import crontab
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
@@ -149,7 +149,17 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 # CELERY_TIMEZONE = 'Asia/Makassar'
-CELERY_BEAT_SCHEDULE = {}
+CELERY_BEAT_SCHEDULE = {'increment_dayoffs': {
+        'task': 'apps.account.tasks.increment_dayoffs',
+        'schedule': crontab(month_of_year='*/1'),
+        'args': (),
+    },
+    'request_date_check': {
+        'task': 'apps.account.tasks.request_date_check',
+        'schedule': crontab(minute='*/1'),
+        'args': (),
+    },
+}
 
 CACHES = {
     "default": {

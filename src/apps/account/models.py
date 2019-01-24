@@ -70,12 +70,13 @@ class RequestDayOffs(models.Model):
     created = models.DateTimeField(default=datetime.now)  # auto_now_add
     from_date = models.DateTimeField(null=False, blank=False)
     to_date = models.DateTimeField(null=False, blank=False)
+    status_changed = models.DateTimeField(null=False, blank=False, default=datetime.now)
     type = models.PositiveSmallIntegerField(
         null=False, blank=False,
         choices=mch.REQUEST_TYPES,
         default=mch.REQUEST_SICKNESS,
     )
-    reason = models.CharField(max_length=256, null=True, blank=True, default=None)  # reason required when status = REJECTED
+    reason = models.CharField(max_length=256, null=True, blank=True)  # reason required when status = REJECTED
     status = models.PositiveSmallIntegerField(
         null=False, blank=False,
         choices=mch.STATUSES,

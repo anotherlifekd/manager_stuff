@@ -38,3 +38,17 @@ def send_email_async(*args, **kwargs):
         # recipient_list=['to@example.com'],
         # fail_silently=False,
     # )
+
+@shared_task
+def request_date_check():
+    from apps.account.models import RequestDayOffs
+    from datetime import datetime, timedelta
+    from apps import model_choices as mch
+
+    try:
+        for request in RequestDayOffs.objects.all().iterator():
+            if (request.created + timedelta(days=30)) < datetime.now() and request.status == mch.STATUS_PENDING:
+                request.status = mch.STATUS_PASSED
+                request.save()
+    except Exception:
+        pass

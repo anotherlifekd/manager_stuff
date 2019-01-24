@@ -1,11 +1,13 @@
 STATUS_PENDING = 0
 STATUS_CONFIRMED = 1
 STATUS_REJECTED = 2
+STATUS_PASSED = 3
 
 STATUSES = (
     (STATUS_PENDING, 'Pending'),
     (STATUS_CONFIRMED, 'Confirmed'),
     (STATUS_REJECTED, 'Rejected'),
+    (STATUS_PASSED, 'Passed'),
 )
 
 
