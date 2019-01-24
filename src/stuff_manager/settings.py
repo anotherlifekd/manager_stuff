@@ -156,7 +156,7 @@ CELERY_BEAT_SCHEDULE = {'increment_dayoffs': {
     },
     'request_date_check': {
         'task': 'apps.account.tasks.request_date_check',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(day_of_week='*/1'),
         'args': (),
     },
 }
