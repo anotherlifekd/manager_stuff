@@ -56,7 +56,7 @@ def index(request):
     #     eta=tomorrow,
     #  )
 
-    return HttpResponse('Index')
+    return render(request, 'index.html')
 
 @cache_page(10)
 def cache_test(r):

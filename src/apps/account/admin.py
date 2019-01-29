@@ -7,6 +7,15 @@ from apps import model_choices as mch
 class CityAdmin(admin.ModelAdmin):
     pass
 
+class RequestDayOffsInline(admin.TabularInline):
+    model = RequestDayOffs
+    show_change_link = True
+    readonly_fields = ('from_date', 'to_date')
+    # form = ...
+
+    # def get_formset(self, request, obj=None, **kwargs):
+    #     pass
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     readonly_fields = []
@@ -14,6 +23,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ['date_joined', 'last_login', 'age']
     list_per_page = 10
     search_fields = ['email', 'first_name', 'phone']
+    inlines = [RequestDayOffsInline]
 
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:
