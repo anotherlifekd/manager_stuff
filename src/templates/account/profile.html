@@ -8,7 +8,7 @@
 
 
 User Profile:
-
+<div>{{ mch.REQUEST_SICKNESS }}</div>
 <form action="{% url 'account:profile' %}" method="POST">
     {% csrf_token %}
     {{ form.as_p }}

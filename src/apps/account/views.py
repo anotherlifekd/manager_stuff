@@ -66,9 +66,7 @@ def cache_test(r):
 
 @login_required
 def profile(request):
-
     user = request.user
-
 
     with open('./users_log.txt', 'a') as file:
         ip = request.META.get('REMOTE_ADDR')
@@ -124,8 +122,6 @@ def faq(request):
 @cache_page(10)
 def tos(request):
     return render(request, 'tos/tos.html')
-
-
 
 @login_required
 def create_request(request):
