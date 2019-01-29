@@ -42,10 +42,10 @@ class RequestDayOffForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         if not self.errors:
+            data = cleaned_data['to_date'] - cleaned_data['from_date']
             if cleaned_data['from_date'] > cleaned_data['to_date']:
                 self.add_error('to_date', 'from_date cannot be greater then to_date')
 
-            data = cleaned_data['to_date'] - cleaned_data['from_date']
             if cleaned_data['type'] == mch.REQUEST_DAYOFF and data.days > 1:
                 self.add_error('to_date', 'dayoff should be not more then 1 day')
 
@@ -63,6 +63,8 @@ class RequestDayOffForm(forms.ModelForm):
                     count += 1
                 if count > 20:
                     self.add_error('to_date', 'vocation 20 days')
+                if count > self.user.vacations_days:
+                    self.add_error('type', "you have not enough days to get this vacation")
 
     def save(self, commit=True):
         instance = super().save(commit=False)

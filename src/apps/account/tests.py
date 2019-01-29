@@ -47,10 +47,35 @@ class ViewsTest(TestCase):
         self.assertEqual(type(response.context['form']), RequestDayOffForm)
         response = client.post(reverse('account:create-request'),
                                data={'type': mch.REQUEST_DAYOFF,
-                                     'date_from': datetime(2020, 1, 2),
-                                     'date_to': datetime(2020, 1, 1)})
-        self.assertEqual(response.context['form'].errors['date_to'],
-                         ['date_from cannot be greater than date_to'])
+                                     'from_date': datetime(2020, 1, 2),
+                                     'to_date': datetime(2020, 1, 1),
+                                     'status_changed': datetime(2020, 1, 1)})
+        self.assertEqual(response.context['form'].errors['to_date'],
+                         ['from_date cannot be greater then to_date'])
+
+        response = client.post(reverse('account:create-request'),
+                               data={'type': mch.REQUEST_DAYOFF,
+                                     'from_date': datetime(2020, 1, 2),
+                                     'to_date': datetime(2020, 1, 15),
+                                     'status_changed': datetime(2020, 1, 2)})
+        self.assertEqual(response.context['form'].errors['to_date'],
+                         ['dayoff should be not more then 1 day'])
+
+        response = client.post(reverse('account:create-request'),
+                               data={'type': mch.REQUEST_VACATION,
+                                     'from_date': datetime(2018, 12, 19),
+                                     'to_date': datetime(2019, 2, 10),
+                                     'status_changed': datetime(2019, 1, 29)})
+        self.assertEqual(response.context['form'].errors['to_date'],
+                         ['vocation 20 days'])
+
+        response = client.post(reverse('account:create-request'),
+                               data={'type': mch.REQUEST_VACATION,
+                                     'from_date': datetime(2018, 12, 19),
+                                     'to_date': datetime(2019, 1, 5),
+                                     'status_changed': datetime(2019, 1, 29)})
+        self.assertEqual(response.context['form'].errors['type'],
+                         ["you have not enough days to get this vacation"])
 
     def test_other_form(self):
         pass

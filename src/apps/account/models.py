@@ -18,7 +18,6 @@ class User(AbstractUser):
         return self.groups.filter(name='HR').exists()
 
     def save(self, *args, **kwargs):
-        print('22222222222')
         self.username = self.email
         super().save(*args, **kwargs)
         # instance = super().save(commit=False)
