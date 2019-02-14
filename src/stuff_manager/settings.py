@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'm5mey0l^4g@m0wmw)7f7r7#ex=@6h^ltw&k*0tb*wh)ee%5rmv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
     'apps.account',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -68,10 +69,21 @@ WSGI_APPLICATION = 'stuff_manager.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'stuff_manager',
+        'USER': 'admin',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -113,7 +125,62 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 
-try:
-    from stuff_manager.settings_local import *
-except ImportError:
-    print('No local settings loaded!' * 10)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+
+# custom settings
+AUTH_USER_MODEL = 'account.User'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "bobertestdjango@gmail.com"
+EMAIL_HOST_PASSWORD = "qwee1qwee"
+LOGIN_REDIRECT_URL = 'account:profile'
+
+
+from celery.schedules import crontab
+
+INTERNAL_IPS = '127.0.0.1'
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+# CELERY_TIMEZONE = 'Asia/Makassar'
+CELERY_BEAT_SCHEDULE = {'increment_dayoffs': {
+        'task': 'apps.account.tasks.increment_dayoffs',
+        'schedule': crontab(month_of_year='*/1'),
+        'args': []
+        },
+        'request_date_check': {
+        'task': 'apps.account.tasks.request_date_check',
+        'schedule': crontab(day_of_week='*/1'),
+        'args': []
+        }
+}
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "example"
+    }
+}
+
+
+
+from pdb import set_trace
+__builtins__['st'] = set_trace  # st()
+
+
+# try:
+#     from stuff_manager.settings_local import *
+# except ImportError:
+#     print('No local settings loaded')

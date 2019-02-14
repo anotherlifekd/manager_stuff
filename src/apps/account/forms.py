@@ -83,7 +83,7 @@ class UserAdminForm(forms.ModelForm):
         model = User
         fields = [
             'age', 'password',
-            'email', 'salary'
+            'email', 'salary',
         ]
 
     def clean(self):
