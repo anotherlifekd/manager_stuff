@@ -1,10 +1,13 @@
-<!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Request</title>
+    <link rel="stylesheet" href="{% static 'account/create-request/style.css' %}">
 </head>
 <body>
+
+<h1 class="main">Request Form:</h1>
 
 <form method="POST">
     {% csrf_token %}

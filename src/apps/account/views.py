@@ -11,6 +11,9 @@ from django.views.decorators.cache import cache_page
 from django.core.mail import send_mail
 from django.conf import settings
 
+def main(request):
+    return render(request, 'main/main.html')
+
 
 def index(request):
     from apps.account.tasks import send_email_async, task_number_one
@@ -97,7 +100,7 @@ def profile(request):
 
     context = {'form': form}
     return render(request, 'account/profile.html', context=context)
-    return HttpResponse(result)
+    #return HttpResponse(result)
 
 def contact_us(request):
     form_us = ContactUsForm()

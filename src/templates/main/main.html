@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
+</head>
+<body>
+
+    <div class="wrapper">
+    	<header class="header">
+    		<div class="header__super">
+				<p class="header__text">For your company</p>
+				<span class="header__caption">STAFF MANAGER</span>
+				<button class="btn header__button" onclick="window.location.href = 'http://stuff-manager.com/auth/login/';">LOGIN</button>
+				<p class="header__title">If you do not have a profile, contact <a href="#" class="header__link">your administrator!</a></p>
+			</div>
+    	</header>
+    </div>
+    
+</body>
+</html>
